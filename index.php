@@ -129,15 +129,42 @@
             <h2 class="gallery-heading">আপলোড করা ছবি সমূহ</h2>
             <div class="photo-gallery">
 
-                <div class="empty-gallery-message">
-                    ছবি আপলোড করার জন্য অপেক্ষা করছে... <br>
-                    আপনার আপলোড করা ছবিগুলি এখানে দেখা যাবে।
-                </div>
+                <?php
+                $upload_dir = 'uploads/';
+                // নিশ্চিত করুন যে uploads ফোল্ডারটি আছে
+                if (is_dir($upload_dir)) {
+                    $files = array_diff(scandir($upload_dir), array('.', '..')); // সব ফাইল লোড করা
+                    
+                    if (count($files) > 0) {
+                        foreach ($files as $file) {
+                            $file_path = $upload_dir . $file;
+                            $file_extension = strtolower(pathinfo($file_path, PATHINFO_EXTENSION));
+                            
+                            // শুধুমাত্র ছবি ফাইল (.jpg, .png, .jpeg, .gif) দেখানো হচ্ছে
+                            if (in_array($file_extension, ['jpg', 'jpeg', 'png', 'gif'])) {
+                                $upload_time = date ("Y-m-d H:i:s", filemtime($file_path)); // আপলোড টাইম দেখাচ্ছে
 
+                                echo '<div class="photo-item">';
+                                echo '    <img src="' . $file_path . '" alt="' . htmlspecialchars($file) . '">';
+                                echo '    <div class="photo-info">';
+                                echo '        <h3>' . htmlspecialchars($file) . '</h3>'; // ছবির নাম
+                                echo '        <p>আপলোড: ' . $upload_time . '</p>';
+                                echo '    </div>';
+                                echo '</div>';
+                            }
+                        }
+                    } else {
+                        // যদি কোনো ছবি না থাকে
+                        echo '<div class="empty-gallery-message">';
+                        echo '    ছবি আপলোড করার জন্য অপেক্ষা করছে...';
+                        echo '</div>';
+                    }
+                } else {
+                    // uploads ফোল্ডার না থাকলে
+                    echo '<div class="empty-gallery-message" style="color: red;">';
+                    echo '    **এরর:** "uploads" ফোল্ডারটি তৈরি করা নেই অথবা পারমিশন নেই।';
+                    echo '</div>';
+                }
+                ?>
             </div>
-        </section>
-
-    </div>
-
-</body>
-</html>
+    </section>
